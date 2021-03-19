@@ -1,0 +1,34 @@
+# Source files
+# ============
+*.pxd                   text diff=python eol=lf
+*.py                    text diff=python eol=lf
+*.py3                   text diff=python eol=lf
+*.pyw                   text diff=python eol=lf
+*.pyx                   text diff=python eol=lf
+*.pyz                   text diff=python eol=lf
+*.sh                    text eol=lf
+*.rst                   text eol=lf
+*.cfg                   text eol=lf
+*.{cmd,[cC][mM][dD]}    text eol=crlf
+*.{bat,[bB][aA][tT]}    text eol=crlf
+*.ps1                   text eol=crlf
+*.json                  text eol=lf
+*.xml                   text eol=lf
+*.yaml                  text eol=lf
+*.yml                   text eol=lf
+Dockerfile              text eol=lf
+.jenkinsfiles\*         text eol=lf
+Jenkinsfile             text eol=lf
+*.md                    text eol=lf
+*.csv                   text eol=lf
+*.txt                   text eol=lf
+
+# Graphics
+*.png                   binary
+*.jpg                   binary
+*.jpeg                  binary
+*.gif                   binary
+*.ico                   binary
+
+# Other
+*.exe                   binary
