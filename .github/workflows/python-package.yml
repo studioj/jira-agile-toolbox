@@ -5,7 +5,7 @@ name: Python package
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, add_first_functionality ]
   pull_request:
     branches: [ main ]
 
@@ -40,6 +40,9 @@ jobs:
         path: . # optional, default is .
         # The number of characters allowed per line.
         line-length: 140 # optional, default is 81
+    - name: Install package
+      run: |
+        pip install .
     - name: Test with pytest
       run: |
         pytest
