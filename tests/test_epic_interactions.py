@@ -1,6 +1,4 @@
-import unittest
-from collections import namedtuple
-
+from unittest import TestCase
 from unittest.mock import Mock, MagicMock
 
 from jira_agile_toolbox import JiraAgileToolBox
@@ -9,12 +7,11 @@ from jira_agile_toolbox import JiraAgileToolBox
 class MockedJiraIssue(object):
     def __init__(self, story_points=None, status="Reported"):
         self.fields = MagicMock()
-        # self.fields.status = namedtuple("status", ["name"])
         self.fields.customfield_10282 = story_points
         self.fields.status.name = status
 
 
-class TestEpicStoryPointRetrieval(unittest.TestCase):
+class TestEpicStoryPointRetrieval(TestCase):
     def test_get_story_points_from_epic_returns_a_dict_containing_the_total_story_points(self):
         # Given
         jira_client = Mock()
