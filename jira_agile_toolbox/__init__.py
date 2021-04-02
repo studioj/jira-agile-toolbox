@@ -23,18 +23,16 @@ class JiraAgileToolBox(object):
         :rtype: dict
         """
         if not self._story_points_custom_field:
-            fields = self._jira_client.fields()
-            for field in fields:
-                if field["name"] == self._story_points_custom_field_name:
-                    self._story_points_custom_field = field["id"]
+            self._story_points_custom_field = self.get_custom_field_from_name(self._story_points_custom_field_name)
 
         issues_in_epic = self._jira_client.search_issues(
-            "'Epic Link' = " + "PROJ001-001", fields=self._story_points_custom_field, maxResults=0
+            "'Epic Link' = " + epic, fields=[self._story_points_custom_field, "status"], maxResults=0
         )
-        sum_of_story_points = 0
-        for issue in issues_in_epic:
-            if issue and getattr(issue.fields, self._story_points_custom_field, None):
-                sum_of_story_points += int(getattr(issue.fields, self._story_points_custom_field, 0))
+        sum_of_story_points = sum(
+            int(getattr(issue.fields, self._story_points_custom_field, 0))
+            for issue in issues_in_epic
+            if issue and getattr(issue.fields, self._story_points_custom_field, None)
+        )
 
         all_states = list({issue.fields.status.name for issue in issues_in_epic if issue})
 
@@ -45,3 +43,8 @@ class JiraAgileToolBox(object):
 
         sum_of_story_points_per_state["total"] = sum_of_story_points
         return sum_of_story_points_per_state
+
+    def get_custom_field_from_name(self, name):
+        for field in self._jira_client.fields():
+            if field["name"] == name:
+                return field["id"]
