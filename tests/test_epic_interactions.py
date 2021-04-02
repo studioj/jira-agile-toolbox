@@ -86,7 +86,7 @@ class TestEpicStoryPointRetrieval(TestCase):
         jat.get_storypoints_from_epic("PROJ001-001")
 
         # Then
-        jira_client.search_issues.assert_called_with("'Epic Link' = " + "PROJ001-001", fields="customfield_10282", maxResults=0)
+        jira_client.search_issues.assert_called_with("'Epic Link' = " + "PROJ001-001", fields=["customfield_10282", "status"], maxResults=0)
 
     def test_get_story_points_from_epic_calculates_the_total_story_pointS_for_3_issues(self):
         # Given
@@ -320,6 +320,6 @@ class TestEpicStoryPointRetrieval(TestCase):
         # Then
         jira_client.fields.assert_called_once()
 
-        jira_client.search_issues.assert_called_with("'Epic Link' = " + "PROJ001-001", fields="customfield_10333", maxResults=0)
+        jira_client.search_issues.assert_called_with("'Epic Link' = " + "PROJ001-001", fields=["customfield_10333", "status"], maxResults=0)
 
         self.assertEqual({"total": 100, "Reported": 100}, result)
