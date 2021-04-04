@@ -1,7 +1,11 @@
-__version_info__ = (0, 0, 6)
-__version__ = ".".join(map(str, __version_info__))
-
 import jira
+from pkg_resources import get_distribution, DistributionNotFound
+
+try:
+    __version__ = get_distribution("package-name").version
+except DistributionNotFound:
+    # package is not installed
+    pass
 
 
 class JiraAgileToolBox(object):
