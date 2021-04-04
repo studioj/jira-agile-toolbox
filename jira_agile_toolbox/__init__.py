@@ -1,5 +1,7 @@
-__version_info__ = (0, 0, 5)
+__version_info__ = (0, 0, 6)
 __version__ = ".".join(map(str, __version_info__))
+
+import jira
 
 
 class JiraAgileToolBox(object):
@@ -25,8 +27,10 @@ class JiraAgileToolBox(object):
         if not self._story_points_custom_field:
             self._story_points_custom_field = self.get_custom_field_from_name(self._story_points_custom_field_name)
 
+        epic_key = epic.key if isinstance(epic, jira.Issue) else epic
+
         issues_in_epic = self._jira_client.search_issues(
-            "'Epic Link' = " + epic, fields=[self._story_points_custom_field, "status"], maxResults=0
+            "'Epic Link' = " + epic_key, fields=[self._story_points_custom_field, "status"], maxResults=0
         )
         sum_of_story_points = sum(
             int(getattr(issue.fields, self._story_points_custom_field, 0))
