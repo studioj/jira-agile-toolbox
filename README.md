@@ -22,11 +22,11 @@ pip install jira-agile-toolbox
 
 Example:
 ```python
->>> from jira_agile_toolbox import JiraAgileToolBox
->>> from jira import JIRA
->>> my_jira_client = JIRA("https://my-jira-server.com", basicauth("MYUSERNAME","MYPASSWORD")
->>> tb = JiraAgileToolBox(my_jira_client)
->>> tb.get_storypoints_from_epic("JAT-001")
+>> from jira_agile_toolbox import JiraAgileToolBox
+>> from jira import JIRA
+>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth("MYUSERNAME","MYPASSWORD")
+>> tb = JiraAgileToolBox(my_jira_client)
+>> tb.get_storypoints_from_epic("JAT-001")
 {'total': 100, "Reported": 50, "Closed": 50}
 ```
 
@@ -34,11 +34,11 @@ Example:
 
 Example:
 ```python
->>> from jira_agile_toolbox import JiraAgileToolBox
->>> from jira import JIRA
->>> my_jira_client = JIRA("https://my-jira-server.com", basicauth("MYUSERNAME","MYPASSWORD")
->>> tb = JiraAgileToolBox(my_jira_client)
->>> tb.rank_issues_by_list([my_jira_client.issue("JAT-001"), my_jira_client.issue("JAT-003")] my_jira_client.issue("JAT-005"))
+>> from jira_agile_toolbox import JiraAgileToolBox
+>> from jira import JIRA
+>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth("MYUSERNAME","MYPASSWORD")
+>> tb = JiraAgileToolBox(my_jira_client)
+>> tb.rank_issues_by_list([my_jira_client.issue("JAT-001"), my_jira_client.issue("JAT-003")] my_jira_client.issue("JAT-005"))
 ```
 
 will rank issues like:
