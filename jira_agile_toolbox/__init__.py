@@ -75,3 +75,17 @@ class JiraAgileToolBox(object):
         for i, value in enumerate(reversed_list):
             if i < len(reversed_list) - 1:
                 self._jira_client.rank(reversed_list[i + 1].key, value.key)
+
+    def rank_issues_at_top_of_project(self, ranked_list, project):
+        """
+        moves the provided ranked_list at the top of the backlog of the given project
+
+        :param ranked_list: a list of jira Issues
+        :param project: project key
+        :type project: str
+        """
+        issues_sorted_on_rank = self._jira_client.search_issues(f"project = { project } ORDER BY Rank ASC", fields="key", maxResults=1000)
+        for issue in issues_sorted_on_rank:
+            if issue not in ranked_list:
+                self.rank_issues_by_list(ranked_list, issue)
+                break
