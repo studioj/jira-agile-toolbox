@@ -2,8 +2,6 @@
 
 ![python package workflow](https://github.com/studioj/jira-agile-toolbox/actions/workflows/python-publish.yml/badge.svg)
 ![python package workflow](https://github.com/studioj/jira-agile-toolbox/actions/workflows/python-package.yml/badge.svg)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fstudioj%2Fjira-agile-toolbox.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fstudioj%2Fjira-agile-toolbox?ref=badge_shield)
-
 
 A python package which extends the jira package with agile related functionality
 
@@ -16,6 +14,9 @@ For more info about the jira package
 ```bash
 pip install jira-agile-toolbox
 ```
+
+## Documentation
+https://jira-agile-toolbox.readthedocs.io/
 
 ## Features
 

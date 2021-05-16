@@ -52,6 +52,7 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 html_style = "css/custom_width.css"
+html_theme_options = {"body_max_width": "50%"}
 
 version = jira_agile_toolbox.__version__
 # The full version, including alpha/beta/rc tags.
