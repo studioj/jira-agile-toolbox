@@ -2,13 +2,17 @@
 
 ![python package workflow](https://github.com/studioj/jira-agile-toolbox/actions/workflows/python-publish.yml/badge.svg)
 ![python package workflow](https://github.com/studioj/jira-agile-toolbox/actions/workflows/python-package.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=studioj_jira-agile-toolbox&metric=alert_status)](https://sonarcloud.io/dashboard?id=studioj_jira-agile-toolbox)
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+[![PyPI downloads](https://img.shields.io/pypi/dm/jira-agile-toolbox.svg)](https://pypistats.org/packages/jira-agile-toolbox)
+
 
 A python package which extends the jira package with agile related functionality
 
-For more info about the jira package
-
-- PyPi: https://pypi.org/project/jira/
-- rtd:  https://jira.readthedocs.io/en/latest/
+            For more info about the jira package
+            
+            - PyPi: https://pypi.org/project/jira/
+            - rtd:  https://jira.readthedocs.io/en/latest/
 
 ## Installation
 ```bash
