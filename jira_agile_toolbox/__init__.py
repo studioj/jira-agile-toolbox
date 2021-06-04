@@ -35,7 +35,7 @@ class JiraAgileToolBox(object):
         """
         searches for the epic and returns the number of storypoints as a dict
 
-        :param epic: the epic key or a jira Issue
+        :param epic: and epic key as a string or the epic as a jira.Issue
         :type epic: str jira.Issue
         :return: a dictionary containing total story points
         :rtype: dict
@@ -46,7 +46,7 @@ class JiraAgileToolBox(object):
 
                 >>> from jira_agile_toolbox import JiraAgileToolBox
                 >>> from jira import JIRA
-                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth("MYUSERNAME","MYPASSWORD")
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
                 >>> tb = JiraAgileToolBox(my_jira_client)
                 >>> tb.get_storypoints_from_epic("JAT-001")
                 {'total': 100, "Reported": 50, "Closed": 50}
@@ -55,11 +55,8 @@ class JiraAgileToolBox(object):
         if not self._story_points_custom_field:
             self._story_points_custom_field = self._get_custom_field_from_name(self._story_points_custom_field_name)
 
-        epic_key = epic.key if isinstance(epic, jira.Issue) else epic
-
-        issues_in_epic = self._jira_client.search_issues(
-            "'Epic Link' = " + epic_key, fields=[self._story_points_custom_field, "status"], maxResults=0
-        )
+        fields_to_get = [self._story_points_custom_field, "status"]
+        issues_in_epic = self.get_all_issues_in_epic(epic, fields_to_get)
         sum_of_story_points = sum(
             int(getattr(issue.fields, self._story_points_custom_field, 0))
             for issue in issues_in_epic
@@ -75,6 +72,52 @@ class JiraAgileToolBox(object):
 
         sum_of_story_points_per_state["total"] = sum_of_story_points
         return sum_of_story_points_per_state
+
+    def get_all_issues_in_epic(self, epic, fields=None):
+        """
+        gets all 'Issues in Epic' as a list
+
+        ``Example``
+
+            .. code-block:: python
+
+                >>> from jira_agile_toolbox import JiraAgileToolBox
+                >>> from jira import JIRA
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
+                >>> tb = JiraAgileToolBox(my_jira_client)
+                >>> tb.get_all_issues_in_epic("JAT-001")
+                [<JIRA Issue: key='JAT-002', id='67'>, <JIRA Issue: key='JAT-003', id='68'>, <JIRA Issue: key='JAT-004', id='69'>]
+
+        :param epic: and epic key as a string or the epic as a jira.Issue
+        :type epic: str jira.Issue
+        :param fields: a string or list of strings to limit the fields to get this helps to lower the amount of data to be sent around
+        :type fields: str list
+        :return: a list of jira.Issues
+        :rtype: list
+        """
+        fields_to_get = self._input_validation_fields(fields)
+        epic_key = epic.key if isinstance(epic, jira.Issue) else epic
+        jql_query = f"'Epic Link' = {epic_key}"
+        if fields_to_get:
+            return self._jira_client.search_issues(jql_query, fields=fields_to_get, maxResults=0)
+        return self._jira_client.search_issues(jql_query, maxResults=0)
+
+    def _input_validation_fields(self, fields):
+        fields_to_get = []
+        bad_input = ""
+        if fields:
+            if isinstance(fields, list):
+                fields_to_get = fields
+            elif isinstance(fields, str):
+                fields_to_get = [fields]
+            else:
+                bad_input = "fields, should be a list or a string"
+        for field in fields_to_get:
+            if " " in field:
+                bad_input = "no spaces are allowed in fields"
+        if bad_input:
+            raise ValueError("fields should be a string or a list")
+        return fields_to_get
 
     def _get_custom_field_from_name(self, name):
         """
@@ -100,7 +143,7 @@ class JiraAgileToolBox(object):
 
                 >>> from jira_agile_toolbox import JiraAgileToolBox
                 >>> from jira import JIRA
-                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth("MYUSERNAME","MYPASSWORD")
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
                 >>> tb = JiraAgileToolBox(my_jira_client)
                 >>> tb.rank_issues_by_list([my_jira_client.issue("JAT-001"), my_jira_client.issue("JAT-003")], my_jira_client.issue("JAT-005"))
 
@@ -137,7 +180,7 @@ class JiraAgileToolBox(object):
 
                 >>> from jira_agile_toolbox import JiraAgileToolBox
                 >>> from jira import JIRA
-                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth("MYUSERNAME","MYPASSWORD")
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
                 >>> tb = JiraAgileToolBox(my_jira_client)
                 >>> tb.rank_issues_by_list([my_jira_client.issue("JAT-001"), my_jira_client.issue("JAT-003")])
 
@@ -159,3 +202,44 @@ class JiraAgileToolBox(object):
             if issue not in ranked_list:
                 self.rank_issues_by_list(ranked_list, issue)
                 break
+
+    def add_labels_to_all_sub_items_of_epic(self, epic, labels):
+        """
+        adds labels to all 'Issues in Epic'
+
+        :param epic: and epic key as a string or the epic as a jira.Issue
+        :type epic: str jira.Issue
+        :param labels: the label to set as a string or the labels to set as a list
+        :type labels: str list
+
+        ``Example``
+
+            .. code-block:: python
+
+                >>> from jira_agile_toolbox import JiraAgileToolBox
+                >>> from jira import JIRA
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
+                >>> tb = JiraAgileToolBox(my_jira_client)
+                >>> tb.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"])
+
+            this will append the "label_to_set" to all existing labels of all Issues in Epic
+        """
+        labels_to_set = []
+        bad_input = ""
+        if isinstance(labels, list):
+            labels_to_set = labels
+            for label in labels_to_set:
+                if " " in label:
+                    bad_input = "no spaces are allowed in labels"
+        elif isinstance(labels, str):
+            labels_to_set = [labels]
+            if " " in labels:
+                bad_input = "no spaces are allowed in labels"
+        else:
+            bad_input = "labels, should be a list or a string"
+        if bad_input:
+            raise ValueError(bad_input)
+        items_to_update = self.get_all_issues_in_epic(epic, fields=["labels"])
+        for item in items_to_update:
+            item.fields.labels += labels_to_set
+            item.update(fields={"labels": item.fields.labels})
