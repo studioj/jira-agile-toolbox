@@ -10,6 +10,15 @@ on:
     branches: [ main ]
 
 jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "docs/"
+          pre-build-command: "apt-get update && apt-get install -y git && pip install . pip install sphinx_rtd_theme"
+
   build:
 
     runs-on: ubuntu-latest
