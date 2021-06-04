@@ -56,3 +56,7 @@ will rank issues like:
 | JAT-003 | JAT-003 
 | JAT-002 | JAT-005
 | JAT-001 | JAT-002
+
+- ### more explanation and examples can be found here
+    
+    https://jira-agile-toolbox.readthedocs.io/en/stable/#api-documentation
