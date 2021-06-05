@@ -50,11 +50,31 @@ class TestEpicStoryPointRetrieval(TestCase):
         jat = JiraAgileToolBox(self.jira_client)
 
         # When
-        jat.get_storypoints_from_epic("PROJ001-001")
+        epic = "PROJ001-001"
+        jat.get_storypoints_from_epic(epic)
+
+        # Then
+        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic}", fields=["customfield_10282", "status"], maxResults=0)
+
+    def test_get_story_points_from_epic_looks_in_jira_for_all_children_of_the_epic_passes_on_a_jql_query(self):
+        # Given
+
+        self.jira_client.fields.return_value = DEFAULT_FIELDS_RETURN_VALUE
+        self.jira_client.search_issues.return_value = [
+            MockedJiraIssue(story_points=0),
+            MockedJiraIssue(story_points=1),
+            MockedJiraIssue(story_points=2),
+        ]
+        jat = JiraAgileToolBox(self.jira_client)
+        epic = "PROJ001-001"
+        jql_query = "project in (PROJ001,PROJ002)"
+
+        # When
+        jat.get_storypoints_from_epic(epic, jql_query=jql_query)
 
         # Then
         self.jira_client.search_issues.assert_called_with(
-            "'Epic Link' = " + "PROJ001-001", fields=["customfield_10282", "status"], maxResults=0
+            f"'Epic Link' = {epic} AND {jql_query}", fields=["customfield_10282", "status"], maxResults=0
         )
 
     def test_get_story_points_from_epic_calculates_the_total_story_pointS_for_3_issues(self):
@@ -270,6 +290,25 @@ class TestGetIssuesInEpic(TestCase):
         # Then
         self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
 
+    def test_get_issues_from_epic_allows_to_filter_an_extra_jql_query(self):
+        # Given
+
+        self.jira_client.fields.return_value = DEFAULT_FIELDS_RETURN_VALUE
+        self.jira_client.search_issues.return_value = [
+            MockedJiraIssue(story_points=0),
+            MockedJiraIssue(story_points=1),
+            MockedJiraIssue(story_points=2),
+        ]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.get_all_issues_in_epic("PROJ001-001", fields="a_specific_field", jql_query="project in (PROJ001,PROJ002)")
+
+        # Then
+        self.jira_client.search_issues.assert_called_with(
+            f"'Epic Link' = PROJ001-001 AND project in (PROJ001,PROJ002)", fields=["a_specific_field"], maxResults=0
+        )
+
 
 class TestSetVersionNumberForAllItemsInEpic(TestCase):
     def setUp(self) -> None:
@@ -291,6 +330,41 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
 
         # Then
         sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
+
+    def test_copy_fix_version_from_epic_to_all_items_in_epic_searches_for_the_epic(self):
+        # Given
+        sub_issue1 = MockedJiraIssue(story_points=0)
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = VERSION_RAW
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
+
+        # Then
+        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic.key}", fields=["fixVersions"], maxResults=0)
+
+    def test_copy_fix_version_from_epic_to_all_items_in_epic_searches_for_the_epic_and_passes_on_extra_jql_query(self):
+        # Given
+        sub_issue1 = MockedJiraIssue(story_points=0)
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = VERSION_RAW
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1]
+        jat = JiraAgileToolBox(self.jira_client)
+        jql_query = "project in (PROJ001,PROJ002)"
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic, jql_query=jql_query)
+
+        # Then
+        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic.key} AND {jql_query}", fields=["fixVersions"], maxResults=0)
 
     def test_copy_fix_version_from_epic_to_all_items_in_epic_for_multiple_versions(self):
         # Given
