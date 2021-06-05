@@ -224,6 +224,13 @@ class JiraAgileToolBox(object):
 
             this will append the "label_to_set" to all existing labels of all Issues in Epic
         """
+        labels_to_set = self._input_validation_labels(labels)
+        items_to_update = self.get_all_issues_in_epic(epic, fields=["labels"])
+        for item in items_to_update:
+            for label in labels_to_set:
+                item.add_field_value("labels", label)
+
+    def _input_validation_labels(self, labels):
         labels_to_set = []
         bad_input = ""
         if isinstance(labels, list):
@@ -239,10 +246,7 @@ class JiraAgileToolBox(object):
             bad_input = "labels, should be a list or a string"
         if bad_input:
             raise ValueError(bad_input)
-        items_to_update = self.get_all_issues_in_epic(epic, fields=["labels"])
-        for item in items_to_update:
-            for label in labels_to_set:
-                item.add_field_value("labels", label)
+        return labels_to_set
 
     def copy_fix_version_from_epic_to_all_items_in_epic(self, epic):
         """
