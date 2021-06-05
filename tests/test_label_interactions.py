@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import jira
 
@@ -23,22 +23,22 @@ class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
         jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"])
 
         # Then
-        self.assertEqual(sub_story.fields.labels, ["label_to_set"])
-        sub_story.update.assert_called_once_with(fields={"labels": sub_story.fields.labels})
+        sub_story.add_field_value.assert_called_with("labels", "label_to_set")
 
-    def test_setting_a_label_for_all_sub_items_which_have_labels_already(self):
+    def test_setting_a_label_for_all_sub_items_multiple_labels(self):
         # Given
-        sub_story = MockedJiraIssue(labels=["some_other_label"])
+        sub_story = MockedJiraIssue()
         self.jira_client.search_issues.return_value = [
             sub_story,
         ]
         jat = JiraAgileToolBox(self.jira_client)
 
         # When
-        jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"])
+        jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set", "label2"])
 
         # Then
-        self.assertEqual(sub_story.fields.labels, ["some_other_label", "label_to_set"])
+        sub_story.add_field_value.assert_any_call("labels", "label_to_set")
+        sub_story.add_field_value.assert_any_call("labels", "label2")
 
     def test_setting_a_label_for_all_sub_items_raises_an_exception_on_a_label_with_a_space(self):
         # Given
