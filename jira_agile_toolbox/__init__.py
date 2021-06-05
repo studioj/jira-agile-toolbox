@@ -203,10 +203,12 @@ class JiraAgileToolBox(object):
                 self.rank_issues_by_list(ranked_list, issue)
                 break
 
-    def add_labels_to_all_sub_items_of_epic(self, epic, labels):
+    def add_labels_to_all_sub_items_of_epic(self, epic, labels, keep_already_present=True):
         """
         adds labels to all 'Issues in Epic'
 
+        :param keep_already_present: if this is set to False already present labels will be overwritten
+        :type keep_already_present: bool
         :param epic: and epic key as a string or the epic as a jira.Issue
         :type epic: str jira.Issue
         :param labels: the label to set as a string or the labels to set as a list
@@ -227,8 +229,11 @@ class JiraAgileToolBox(object):
         labels_to_set = self._input_validation_labels(labels)
         items_to_update = self.get_all_issues_in_epic(epic, fields=["labels"])
         for item in items_to_update:
-            for label in labels_to_set:
-                item.add_field_value("labels", label)
+            if keep_already_present:
+                for label in labels_to_set:
+                    item.add_field_value("labels", label)
+            else:
+                item.update(fields={"labels": labels_to_set})
 
     def _input_validation_labels(self, labels):
         labels_to_set = []

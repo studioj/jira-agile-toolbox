@@ -70,6 +70,36 @@ class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
         # Then
         self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["labels"], maxResults=0)
 
+    def test_setting_a_label_for_all_sub_items_will_remove_already_present_labels(self):
+        # Given
+        self.jira_client.fields.return_value = DEFAULT_FIELDS_RETURN_VALUE
+        sub_story = MockedJiraIssue()
+        self.jira_client.search_issues.return_value = [
+            sub_story,
+        ]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"], keep_already_present=False)
+
+        # Then
+        sub_story.update.assert_called_with(fields={"labels": ["label_to_set"]})
+
+    def test_setting_a_label_for_all_sub_items_will_remove_already_present_labels_single_string_label(self):
+        # Given
+        self.jira_client.fields.return_value = DEFAULT_FIELDS_RETURN_VALUE
+        sub_story = MockedJiraIssue()
+        self.jira_client.search_issues.return_value = [
+            sub_story,
+        ]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", "label_to_set", keep_already_present=False)
+
+        # Then
+        sub_story.update.assert_called_with(fields={"labels": ["label_to_set"]})
+
 
 if __name__ == "__main__":
     unittest.main()
