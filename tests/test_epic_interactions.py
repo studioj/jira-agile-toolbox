@@ -344,3 +344,20 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         # Then
         sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
         sub_issue2.add_field_value.assert_called_with("fixVersions", version1.raw)
+
+    def test_copy_fix_version_from_epic_to_all_items_in_epic_dont_keep_already_present(self):
+        # Given
+        sub_issue1 = MockedJiraIssue(story_points=0)
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = VERSION_RAW
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic, keep_already_present=False)
+
+        # Then
+        sub_issue1.update.assert_called_with(fields={"fixVersions": [version1.raw]})
