@@ -241,5 +241,34 @@ class JiraAgileToolBox(object):
             raise ValueError(bad_input)
         items_to_update = self.get_all_issues_in_epic(epic, fields=["labels"])
         for item in items_to_update:
-            item.fields.labels += labels_to_set
-            item.update(fields={"labels": item.fields.labels})
+            for label in labels_to_set:
+                item.add_field_value("labels", label)
+
+    def copy_fix_version_from_epic_to_all_items_in_epic(self, epic):
+        """
+        copies fixVersions from the epic to all 'Issues in Epic'
+
+        :param epic: and epic key as a string or the epic as a jira.Issue
+        :type epic: str jira.Issue
+        :return: None
+
+        ``Example``
+
+            .. code-block:: python
+
+                >>> from jira_agile_toolbox import JiraAgileToolBox
+                >>> from jira import JIRA
+                >>> my_jira_client = JIRA("https://my-jira-server.com", basic_auth=("MYUSERNAME","MYPASSWORD")
+                >>> tb = JiraAgileToolBox(my_jira_client)
+                >>> epic = my_jira_client.issue("PROJ001-001")
+                >>> epic.fields.fixVersions
+                [<JIRA Version: name='0.0.10', id='31063'>]
+                >>> tb.copy_fix_version_from_epic_to_all_items_in_epic(epic)
+                >>> tb.get_all_issues_in_epic("JAT-001")[0].fields.fixVersions
+                [<JIRA Version: name='0.0.10', id='31063'>]
+        """
+        jira_epic = epic  # if isinstance(epic, jira.Issue) else self._jira_client.issue(epic)
+        versions = [version.raw for version in jira_epic.fields.fixVersions]
+        for issue in self.get_all_issues_in_epic(jira_epic, fields=["fixVersions"]):
+            for version in versions:
+                issue.add_field_value("fixVersions", version)

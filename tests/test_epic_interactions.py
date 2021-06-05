@@ -2,9 +2,19 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 import jira
+import jira.resources
 
 from jira_agile_toolbox import JiraAgileToolBox
 from lib_for_tests import DEFAULT_FIELDS_RETURN_VALUE, MockedJiraIssue
+
+VERSION_RAW = {
+    "self": "https://atlassian-jira.com/rest/api/2/version/31063",
+    "id": "31063",
+    "description": "",
+    "name": "JAT 0.0.9",
+    "archived": False,
+    "released": True,
+}
 
 
 class TestEpicStoryPointRetrieval(TestCase):
@@ -259,3 +269,78 @@ class TestGetIssuesInEpic(TestCase):
 
         # Then
         self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
+
+
+class TestSetVersionNumberForAllItemsInEpic(TestCase):
+    def setUp(self) -> None:
+        self.jira_client = Mock(spec=jira.JIRA)
+
+    def test_copy_fix_version_from_epic_to_all_items_in_epic(self):
+        # Given
+        sub_issue1 = MockedJiraIssue(story_points=0)
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = VERSION_RAW
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
+
+        # Then
+        sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
+
+    def test_copy_fix_version_from_epic_to_all_items_in_epic_for_multiple_versions(self):
+        # Given
+        sub_issue1 = MockedJiraIssue(story_points=0)
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = VERSION_RAW
+        version2 = Mock(spec=jira.resources.Version)
+        version2.raw = {
+            "self": "https://atlassian-jira.com/rest/api/2/version/31064",
+            "id": "31064",
+            "description": "",
+            "name": "JAT 0.0.10",
+            "archived": False,
+            "released": False,
+        }
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1, version2]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
+
+        # Then
+        sub_issue1.add_field_value.assert_any_call("fixVersions", version1.raw)
+        sub_issue1.add_field_value.assert_any_call("fixVersions", version2.raw)
+
+    def test_copy_fix_version_from_epic_to_multiple_items_in_epic(self):
+        # Given
+        sub_issue1 = MockedJiraIssue()
+        sub_issue2 = MockedJiraIssue()
+        version1 = Mock(spec=jira.resources.Version)
+        version1.raw = {
+            "self": "https://atlassian-jira.com/rest/api/2/version/31063",
+            "id": "31063",
+            "description": "",
+            "name": "JAT 0.0.9",
+            "archived": False,
+            "released": True,
+        }
+        epic = MockedJiraIssue()
+        epic.fields.fixVersions = [version1]
+        epic.key = "PROJ001-001"
+        self.jira_client.search_issues.return_value = [sub_issue1, sub_issue2]
+        jat = JiraAgileToolBox(self.jira_client)
+
+        # When
+        jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
+
+        # Then
+        sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
+        sub_issue2.add_field_value.assert_called_with("fixVersions", version1.raw)

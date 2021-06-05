@@ -27,9 +27,12 @@ DEFAULT_FIELDS_RETURN_VALUE = [
 
 
 class MockedJiraIssue(jira.Issue):
-    def __init__(self, story_points=None, status="Reported", labels=[]):
+    def __init__(self, story_points=None, status="Reported", labels=[], fix_versions=[]):
         self.fields = MagicMock()
         self.fields.customfield_10282 = story_points
         self.fields.status.name = status
         self.fields.labels = labels
+        self.fields.fixVersions = fix_versions
         self.update = Mock()
+        self.__getattr__ = Mock()
+        self.add_field_value = Mock()
