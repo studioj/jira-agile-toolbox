@@ -318,7 +318,7 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         # Given
         sub_issue1 = MockedJiraIssue(story_points=0)
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = VERSION_RAW
+        version1.name = "JAT 0.0.9"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1]
         epic.key = "PROJ001-001"
@@ -329,13 +329,13 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
 
         # Then
-        sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
+        sub_issue1.add_field_value.assert_called_with("fixVersions", {"name": version1.name})
 
     def test_copy_fix_version_from_epic_to_all_items_in_epic_searches_for_the_epic(self):
         # Given
         sub_issue1 = MockedJiraIssue(story_points=0)
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = VERSION_RAW
+        version1.name = "JAT 0.0.9"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1]
         epic.key = "PROJ001-001"
@@ -352,7 +352,7 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         # Given
         sub_issue1 = MockedJiraIssue(story_points=0)
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = VERSION_RAW
+        version1.name = "JAT 0.0.9"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1]
         epic.key = "PROJ001-001"
@@ -370,16 +370,9 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         # Given
         sub_issue1 = MockedJiraIssue(story_points=0)
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = VERSION_RAW
+        version1.name = "JAT 0.0.9"
         version2 = Mock(spec=jira.resources.Version)
-        version2.raw = {
-            "self": "https://atlassian-jira.com/rest/api/2/version/31064",
-            "id": "31064",
-            "description": "",
-            "name": "JAT 0.0.10",
-            "archived": False,
-            "released": False,
-        }
+        version2.name = "JAT 0.0.10"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1, version2]
         epic.key = "PROJ001-001"
@@ -390,22 +383,15 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
 
         # Then
-        sub_issue1.add_field_value.assert_any_call("fixVersions", version1.raw)
-        sub_issue1.add_field_value.assert_any_call("fixVersions", version2.raw)
+        sub_issue1.add_field_value.assert_any_call("fixVersions", {"name": version1.name})
+        sub_issue1.add_field_value.assert_any_call("fixVersions", {"name": version2.name})
 
     def test_copy_fix_version_from_epic_to_multiple_items_in_epic(self):
         # Given
         sub_issue1 = MockedJiraIssue()
         sub_issue2 = MockedJiraIssue()
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = {
-            "self": "https://atlassian-jira.com/rest/api/2/version/31063",
-            "id": "31063",
-            "description": "",
-            "name": "JAT 0.0.9",
-            "archived": False,
-            "released": True,
-        }
+        version1.name = "JAT 0.0.9"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1]
         epic.key = "PROJ001-001"
@@ -416,14 +402,14 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
 
         # Then
-        sub_issue1.add_field_value.assert_called_with("fixVersions", version1.raw)
-        sub_issue2.add_field_value.assert_called_with("fixVersions", version1.raw)
+        sub_issue1.add_field_value.assert_called_with("fixVersions", {"name": version1.name})
+        sub_issue2.add_field_value.assert_called_with("fixVersions", {"name": version1.name})
 
     def test_copy_fix_version_from_epic_to_all_items_in_epic_dont_keep_already_present(self):
         # Given
         sub_issue1 = MockedJiraIssue(story_points=0)
         version1 = Mock(spec=jira.resources.Version)
-        version1.raw = VERSION_RAW
+        version1.name = "JAT 0.0.9"
         epic = MockedJiraIssue()
         epic.fields.fixVersions = [version1]
         epic.key = "PROJ001-001"
@@ -434,4 +420,4 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic, keep_already_present=False)
 
         # Then
-        sub_issue1.update.assert_called_with(fields={"fixVersions": [version1.raw]})
+        sub_issue1.update.assert_called_with(fields={"fixVersions": [{"name": version1.name}]})
