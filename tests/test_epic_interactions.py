@@ -254,7 +254,9 @@ class TestGetIssuesInEpic(TestCase):
 
         # Then
         self.assertEqual(self.jira_client.search_issues.return_value, result)
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", maxResults=0)
+        self.jira_client.search_issues.assert_called_with(
+            "'Epic Link' = PROJ001-001", maxResults=0
+        )
 
     def test_get_issues_from_epic_can_filter_on_the_fields_to_retrieve_to_reduce_data_retrieval(self):
         # Given
@@ -271,7 +273,9 @@ class TestGetIssuesInEpic(TestCase):
         jat.get_all_issues_in_epic("PROJ001-001", fields=["a_specific_field"])
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(
+            "'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0
+        )
 
     def test_get_issues_from_epic_takes_a_string_field_or_a_list_of_fields(self):
         # Given
@@ -288,7 +292,9 @@ class TestGetIssuesInEpic(TestCase):
         jat.get_all_issues_in_epic("PROJ001-001", fields="a_specific_field")
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(
+            "'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0
+        )
 
     def test_get_issues_from_epic_allows_to_filter_an_extra_jql_query(self):
         # Given
@@ -306,7 +312,9 @@ class TestGetIssuesInEpic(TestCase):
 
         # Then
         self.jira_client.search_issues.assert_called_with(
-            f"'Epic Link' = PROJ001-001 AND project in (PROJ001,PROJ002)", fields=["a_specific_field"], maxResults=0
+            "'Epic Link' = PROJ001-001 AND project in (PROJ001,PROJ002)",
+            fields=["a_specific_field"],
+            maxResults=0,
         )
 
 
