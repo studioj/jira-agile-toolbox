@@ -14,8 +14,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import jira_agile_toolbox
-
 # -- Project information -----------------------------------------------------
 
 project = "jira-agile-toolbox"
@@ -54,6 +52,6 @@ html_static_path = ["_static"]
 html_style = "css/custom_width.css"
 html_theme_options = {"body_max_width": "50%"}
 
-version = jira_agile_toolbox.__version__
-# The full version, including alpha/beta/rc tags.
-release = version
+# version = jira_agile_toolbox.__version__
+# # The full version, including alpha/beta/rc tags.
+# release = version

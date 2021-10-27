@@ -262,6 +262,7 @@ class JiraAgileToolBox(object):
     def copy_fix_version_from_epic_to_all_items_in_epic(self, epic, keep_already_present=True, jql_query=""):
         """
         copies fixVersions from the epic to all 'Issues in Epic'
+        also applies to different projects as long as the version name is the same it works
 
         :param epic: and epic key as a string or the epic as a jira.Issue
         :type epic: str jira.Issue
@@ -286,11 +287,10 @@ class JiraAgileToolBox(object):
                 [<JIRA Version: name='0.0.10', id='31063'>]
         """
         jira_epic = epic if isinstance(epic, jira.Issue) else self._jira_client.issue(epic)
-        versions = [version.raw for version in jira_epic.fields.fixVersions]
+        versions = [{"name": version.name} for version in jira_epic.fields.fixVersions]
         for issue in self.get_all_issues_in_epic(jira_epic, fields=["fixVersions"], jql_query=jql_query):
-
             if keep_already_present:
                 for version in versions:
-                    issue.add_field_value("fixVersions", version)
+                    issue.add_field_value("fixVersions", {"name": version["name"]})
             else:
                 issue.update(fields={"fixVersions": versions})
