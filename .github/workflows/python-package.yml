@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Python Blacken
-      uses: piotrpawlaczek/python-blacken@v20.8b1
+      uses: piotrpawlaczek/python-blacken@release/stable
       with:
         path: . # optional, default is .
         # The number of characters allowed per line.
