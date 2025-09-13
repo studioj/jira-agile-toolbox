@@ -1,10 +1,13 @@
 import jira
-from pkg_resources import DistributionNotFound, get_distribution
 
 try:
-    __version__ = get_distribution("package-name").version
-except DistributionNotFound:
-    # package is not installed
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    from importlib_metadata import version, PackageNotFoundError  # type: ignore
+
+try:
+    __version__ = version("jira_agile_toolbox")
+except PackageNotFoundError:
     __version__ = "unknown"
 
 

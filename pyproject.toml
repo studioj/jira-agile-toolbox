@@ -46,9 +46,6 @@ test = ["pytest"]
 [tool.hatch.version]
 source = "vcs"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "jira_agile_toolbox/version.py"
-
 [tool.hatch.envs.default]
 dependencies = ["pytest"]
 [tool.hatch.envs.default.scripts]
