@@ -1,15 +1,16 @@
 [build-system]
-requires = ["hatchling>=1.18.0", "hatch-vcs"]
+requires = ["hatchling>=1.18.0", "hatch-vcs>=0.3.0"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jira_agile_toolbox"
+dynamic = ["version"]
 description = "Extends standard jira package with agile specific tooling for metrics and administration"
 readme = "README.md"
 requires-python = ">=3.6"
 license = { text = "MIT" }
 authors = [
-    { name = "Jef Neefs" }
+    { name = "Jef Neefs", email = "noreply@gmail.com" }
 ]
 keywords = ["api", "atlassian", "jira", "rest", "web", "agile", "scrum", "kanban"]
 classifiers = [
@@ -37,13 +38,23 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP"
 ]
 dependencies = ["jira"]
-dynamic = ["version"]
 
-[project.optional-dependencies]
-test = ["pytest"]
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.version]
 source = "vcs"
+fallback-version = "0.0.0"
+raw-options = { local_scheme = "no-local-version" }
+
+[tool.hatch.build.hooks.vcs]
+version-file = "jira_agile_toolbox/_version.py"
+write-to-file = true
+
+[tool.hatch.build]
+artifacts = [
+    "jira_agile_toolbox/_version.py",
+]
 
 [tool.hatch.envs.default]
 dependencies = ["pytest"]
