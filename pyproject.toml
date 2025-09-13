@@ -2,15 +2,12 @@
 requires = ["hatchling>=1.18.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
-[tool.hatch.publish]
-repositories = { test = "https://test.pypi.org/legacy/" }
-
 [project]
 name = "jira_agile_toolbox"
 description = "Extends standard jira package with agile specific tooling for metrics and administration"
 readme = "README.md"
 requires-python = ">=3.6"
-license = { file = "LICENSE" }
+license = { text = "MIT" }
 authors = [
     { name = "Jef Neefs" }
 ]
@@ -41,7 +38,6 @@ classifiers = [
 ]
 dependencies = ["jira"]
 dynamic = ["version"]
-urls = { Homepage = "https://github.com/studioj/jira-agile-toolbox" }
 
 [project.optional-dependencies]
 test = ["pytest"]
@@ -54,8 +50,13 @@ dependencies = ["pytest"]
 [tool.hatch.envs.default.scripts]
 test = "pytest -ra -q tests"
 
-[tool.hatch.build.targets.sdist]
-include = ["jira_agile_toolbox/**", "tests/**", "README.md", "LICENSE"]
-
 [tool.hatch.build.targets.wheel]
-include = ["jira_agile_toolbox/**", "README.md", "LICENSE"]
+packages = ["jira_agile_toolbox"]
+
+[tool.hatch.build.targets.sdist]
+include = ["jira_agile_toolbox", "tests", "README.md", "LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/studioj/jira-agile-toolbox"
+Documentation = "https://jira-agile-toolbox.readthedocs.io/"
+Repository = "https://github.com/studioj/jira-agile-toolbox.git"
