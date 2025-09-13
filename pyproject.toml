@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling>=1.18.0", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jira_agile_toolbox"
+description = "Extends standard jira package with agile specific tooling for metrics and administration"
+readme = "README.md"
+requires-python = ">=3.6"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Jef Neefs" }
+]
+keywords = ["api", "atlassian", "jira", "rest", "web", "agile", "scrum", "kanban"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+    "Topic :: Office/Business",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP"
+]
+dependencies = ["jira"]
+dynamic = ["version"]
+urls = { Homepage = "https://github.com/studioj/jira-agile-toolbox" }
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "jira_agile_toolbox/version.py"
+
+[tool.hatch.envs.default]
+dependencies = ["pytest"]
+[tool.hatch.envs.default.scripts]
+test = "pytest -ra -q tests"
+
+[tool.hatch.build.targets.sdist]
+include = ["jira_agile_toolbox/**", "tests/**", "README.md", "LICENSE"]
+
+[tool.hatch.build.targets.wheel]
+include = ["jira_agile_toolbox/**", "README.md", "LICENSE"]
