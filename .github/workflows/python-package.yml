@@ -59,7 +59,25 @@ jobs:
     - name: Build package with Hatch
       run: hatch build
 
-    # Only run publish and verify steps on push to main, not on pull requests
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist/
+
     - name: Publish to TestPyPI
       uses: pypa/gh-action-pypi-publish@v1.8.10
       with:
