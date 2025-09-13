@@ -104,7 +104,7 @@ class JiraAgileToolBox:
         """
         fields_to_get = self._input_validation_fields(fields)
         epic_key = epic.key if isinstance(epic, jira.Issue) else epic
-        jql_query_to_find_the_issues = f"'Epic Link' = {epic_key} AND {jql_query}" if jql_query else f"'Epic Link' = {epic_key}"
+        jql_query_to_find_the_issues = f"'parentEpic' = {epic_key} AND {jql_query}" if jql_query else f"'parentEpic' = {epic_key}"
         if fields_to_get:
             return self._jira_client.search_issues(jql_query_to_find_the_issues, fields=fields_to_get, maxResults=0)
         return self._jira_client.search_issues(jql_query_to_find_the_issues, maxResults=0)

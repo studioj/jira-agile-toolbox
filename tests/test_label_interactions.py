@@ -68,7 +68,7 @@ class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
         jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"])
 
         # Then
-        self.jira_client.search_issues.assert_called_with("'Epic Link' = PROJ001-001", fields=["labels"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with("'parentEpic' = PROJ001-001", fields=["labels"], maxResults=0)
 
     def test_setting_a_label_for_all_sub_items_passes_on_the_jql_query(self):
         # Given
@@ -85,7 +85,7 @@ class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
         jat.add_labels_to_all_sub_items_of_epic(epic, ["label_to_set"], jql_query=jql_query)
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic} AND {jql_query}", fields=["labels"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(f"'parentEpic' = {epic} AND {jql_query}", fields=["labels"], maxResults=0)
 
     def test_setting_a_label_for_all_sub_items_will_remove_already_present_labels(self):
         # Given
