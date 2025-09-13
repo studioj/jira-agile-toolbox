@@ -1,28 +1,44 @@
 # This workflow will upload a Python Package using Hatch when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Upload Python Package
+name: Upload Python Package to PyPI
 
 on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      # Used for OIDC authentication for PyPI trusted publishing
+      id-token: write
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for proper versioning
+
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.x'
+
     - name: Install Hatch
       run: |
         python -m pip install --upgrade pip
-        pip install hatch
-    - name: Build and publish with Hatch
+        pip install hatch hatch-vcs
+
+    - name: Build package
+      run: hatch build
+
+    - name: Publish to PyPI
+      env:
+        PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        HATCH_KEYRING__DISABLE: 1
       run: |
-        hatch build
-        hatch publish --user __token__ --auth ${{ secrets.PYPI_API_TOKEN }}
+        hatch publish --user __token__ --auth "$PYPI_API_TOKEN"

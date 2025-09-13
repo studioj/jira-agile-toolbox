@@ -2,6 +2,9 @@
 requires = ["hatchling>=1.18.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
+[tool.hatch.publish]
+repositories = { test = "https://test.pypi.org/legacy/" }
+
 [project]
 name = "jira_agile_toolbox"
 description = "Extends standard jira package with agile specific tooling for metrics and administration"
