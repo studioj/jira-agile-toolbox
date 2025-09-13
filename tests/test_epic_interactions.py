@@ -3,9 +3,9 @@ from unittest.mock import Mock
 
 import jira
 import jira.resources
+from lib_for_tests import DEFAULT_FIELDS_RETURN_VALUE, MockedJiraIssue
 
 from jira_agile_toolbox import JiraAgileToolBox
-from lib_for_tests import DEFAULT_FIELDS_RETURN_VALUE, MockedJiraIssue
 
 VERSION_RAW = {
     "self": "https://atlassian-jira.com/rest/api/2/version/31063",
