@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling>=1.18.0", "hatch-vcs>=0.3.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jira_agile_toolbox"
+dynamic = ["version"]
+description = "Extends standard jira package with agile specific tooling for metrics and administration"
+readme = "README.md"
+requires-python = ">=3.6"
+license = { text = "MIT" }
+authors = [
+    { name = "Jef Neefs", email = "noreply@gmail.com" }
+]
+keywords = ["api", "atlassian", "jira", "rest", "web", "agile", "scrum", "kanban"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+    "Topic :: Office/Business",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP"
+]
+dependencies = ["jira"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
+raw-options = { local_scheme = "no-local-version" }
+
+[tool.hatch.build.hooks.vcs]
+version-file = "jira_agile_toolbox/_version.py"
+write-to-file = true
+
+[tool.hatch.build]
+artifacts = [
+    "jira_agile_toolbox/_version.py",
+]
+
+[tool.hatch.envs.default]
+dependencies = ["pytest"]
+[tool.hatch.envs.default.scripts]
+test = "pytest -ra -q tests"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "sphinx>=7.0.0",
+  "sphinx-rtd-theme>=1.3.0",
+  "myst-parser>=2.0.0",
+]
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -v -W -b html docs/source/ docs/_build/html"
+serve = "python -m http.server --directory docs/_build/html"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jira_agile_toolbox"]
+
+[tool.hatch.build.targets.sdist]
+include = ["jira_agile_toolbox", "tests", "README.md", "LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/studioj/jira-agile-toolbox"
+Documentation = "https://jira-agile-toolbox.readthedocs.io/"
+Repository = "https://github.com/studioj/jira-agile-toolbox.git"

@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "jira-agile-toolbox"
-copyright = "2021, Jef Neefs"
+copy_right = "2021, Jef Neefs"
 author = "Jef Neefs"
 
 

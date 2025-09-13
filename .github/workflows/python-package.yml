@@ -1,6 +1,4 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Python package main build
 
 on:
@@ -9,53 +7,123 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: ammaraskar/sphinx-action@master
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          docs-folder: "docs/"
+          python-version: "3.x"
+      - name: Install Hatch
+        run: |
+          python -m pip install --upgrade pip
+          pip install hatch
+      - name: Build documentation
+        run: |
+          hatch run docs:build
 
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
-
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13']
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for proper versioning
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+
+    - name: Install Hatch
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest build twine
-        python -m pip install -r requirements.txt
+        pip install hatch hatch-vcs flake8
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        # exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=140 --statistics
+
     - name: Python Blacken
       uses: piotrpawlaczek/python-blacken@release/stable
       with:
-        path: . # optional, default is .
-        # The number of characters allowed per line.
-        line-length: 140 # optional, default is 81
-    - name: Install package
-      run: |
-        pip install .
-    - name: Test with pytest
-      run: |
-        pytest
-    - name: build and validate package
-      run: |
-        python -m build --sdist --wheel --outdir dist/
-        twine check dist/*
+        path: .
+        line-length: 140
 
+    - name: Test with Hatch
+      run: |
+        hatch run test
+
+    - name: Build package with Hatch
+      run: hatch build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-python-${{ matrix.python-version }}
+        path: dist/
+        if-no-files-found: warn
+        compression-level: 6
+        retention-days: 1
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/jira-agile-toolbox/
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: dist-python-*
+        path: dist
+        merge-multiple: true
+
+    - name: Show contents of dist directory
+      run: ls -la dist/
+
+    - name: Publish to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        packages-dir: dist
+        verify-metadata: true
+        verbose: true
+        skip-existing: true
+
+    - name: Get package version
+      id: get_version
+      run: |
+        VERSION=$(ls dist/jira_agile_toolbox-*.whl | sed -E 's/.*jira_agile_toolbox-([0-9a-zA-Z\._\+\-]+)-py3-none-any\.whl/\1/')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+
+    - name: Verify package installation
+      run: |
+        python -m pip install --upgrade pip
+        pip install -i https://test.pypi.org/simple jira-agile_toolbox==${{ steps.get_version.outputs.version }} \
+          --extra-index-url https://pypi.org/simple

@@ -1,10 +1,10 @@
 import unittest
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 
 import jira
+from lib_for_tests import DEFAULT_FIELDS_RETURN_VALUE, MockedJiraIssue
 
 from jira_agile_toolbox import JiraAgileToolBox
-from lib_for_tests import MockedJiraIssue, DEFAULT_FIELDS_RETURN_VALUE
 
 
 class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
@@ -68,7 +68,7 @@ class TestLabelSettingForSubItemsOfAnEpic(unittest.TestCase):
         jat.add_labels_to_all_sub_items_of_epic("PROJ001-001", ["label_to_set"])
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = PROJ001-001", fields=["labels"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with("'Epic Link' = PROJ001-001", fields=["labels"], maxResults=0)
 
     def test_setting_a_label_for_all_sub_items_passes_on_the_jql_query(self):
         # Given
