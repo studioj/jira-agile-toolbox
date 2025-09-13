@@ -54,7 +54,7 @@ class TestEpicStoryPointRetrieval(TestCase):
         jat.get_storypoints_from_epic(epic)
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic}", fields=["customfield_10282", "status"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(f"'parentEpic' = {epic}", fields=["customfield_10282", "status"], maxResults=0)
 
     def test_get_story_points_from_epic_looks_in_jira_for_all_children_of_the_epic_passes_on_a_jql_query(self):
         # Given
@@ -74,7 +74,7 @@ class TestEpicStoryPointRetrieval(TestCase):
 
         # Then
         self.jira_client.search_issues.assert_called_with(
-            f"'Epic Link' = {epic} AND {jql_query}", fields=["customfield_10282", "status"], maxResults=0
+            f"'parentEpic' = {epic} AND {jql_query}", fields=["customfield_10282", "status"], maxResults=0
         )
 
     def test_get_story_points_from_epic_calculates_the_total_story_pointS_for_3_issues(self):
@@ -205,7 +205,7 @@ class TestEpicStoryPointRetrieval(TestCase):
         self.jira_client.fields.assert_called_once()
 
         self.jira_client.search_issues.assert_called_with(
-            "'Epic Link' = " + "PROJ001-001", fields=["customfield_10333", "status"], maxResults=0
+            "'parentEpic' = " + "PROJ001-001", fields=["customfield_10333", "status"], maxResults=0
         )
 
         self.assertEqual({"total": 100, "Reported": 100}, result)
@@ -228,7 +228,7 @@ class TestEpicStoryPointRetrieval(TestCase):
         self.jira_client.fields.assert_called_once()
 
         self.jira_client.search_issues.assert_called_with(
-            "'Epic Link' = " + "PROJ001-001", fields=["customfield_10282", "status"], maxResults=0
+            "'parentEpic' = " + "PROJ001-001", fields=["customfield_10282", "status"], maxResults=0
         )
 
         self.assertEqual({"total": 100, "Reported": 100}, result)
@@ -254,7 +254,7 @@ class TestGetIssuesInEpic(TestCase):
 
         # Then
         self.assertEqual(self.jira_client.search_issues.return_value, result)
-        self.jira_client.search_issues.assert_called_with("'Epic Link' = PROJ001-001", maxResults=0)
+        self.jira_client.search_issues.assert_called_with("'parentEpic' = PROJ001-001", maxResults=0)
 
     def test_get_issues_from_epic_can_filter_on_the_fields_to_retrieve_to_reduce_data_retrieval(self):
         # Given
@@ -271,7 +271,7 @@ class TestGetIssuesInEpic(TestCase):
         jat.get_all_issues_in_epic("PROJ001-001", fields=["a_specific_field"])
 
         # Then
-        self.jira_client.search_issues.assert_called_with("'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with("'parentEpic' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
 
     def test_get_issues_from_epic_takes_a_string_field_or_a_list_of_fields(self):
         # Given
@@ -288,7 +288,7 @@ class TestGetIssuesInEpic(TestCase):
         jat.get_all_issues_in_epic("PROJ001-001", fields="a_specific_field")
 
         # Then
-        self.jira_client.search_issues.assert_called_with("'Epic Link' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with("'parentEpic' = PROJ001-001", fields=["a_specific_field"], maxResults=0)
 
     def test_get_issues_from_epic_allows_to_filter_an_extra_jql_query(self):
         # Given
@@ -306,7 +306,7 @@ class TestGetIssuesInEpic(TestCase):
 
         # Then
         self.jira_client.search_issues.assert_called_with(
-            "'Epic Link' = PROJ001-001 AND project in (PROJ001,PROJ002)", fields=["a_specific_field"], maxResults=0
+            "'parentEpic' = PROJ001-001 AND project in (PROJ001,PROJ002)", fields=["a_specific_field"], maxResults=0
         )
 
 
@@ -346,7 +346,7 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic)
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic.key}", fields=["fixVersions"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(f"'parentEpic' = {epic.key}", fields=["fixVersions"], maxResults=0)
 
     def test_copy_fix_version_from_epic_to_all_items_in_epic_searches_for_the_epic_and_passes_on_extra_jql_query(self):
         # Given
@@ -364,7 +364,9 @@ class TestSetVersionNumberForAllItemsInEpic(TestCase):
         jat.copy_fix_version_from_epic_to_all_items_in_epic(epic, jql_query=jql_query)
 
         # Then
-        self.jira_client.search_issues.assert_called_with(f"'Epic Link' = {epic.key} AND {jql_query}", fields=["fixVersions"], maxResults=0)
+        self.jira_client.search_issues.assert_called_with(
+            f"'parentEpic' = {epic.key} AND {jql_query}", fields=["fixVersions"], maxResults=0
+        )
 
     def test_copy_fix_version_from_epic_to_all_items_in_epic_for_multiple_versions(self):
         # Given
